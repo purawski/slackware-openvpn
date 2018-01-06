@@ -13,8 +13,8 @@ RUN slackpkg -batch=on -default_answer=y install \
 
 RUN slackpkg -batch=on -default_answer=y install \
     binutils gcc-5 gcc-g++-5 perl\
-  glibc-2 libmpc kernel-headers make autoconf automake m4 zlib bc \
-  cmake libarchive nettle lzo libxml2 gc flex bison rsync gnupg cyrus-sasl
+    glibc-2 libmpc kernel-headers make autoconf automake m4 zlib bc \
+    cmake libarchive nettle libxml2 gc flex bison rsync gnupg cyrus-sasl
 RUN /usr/sbin/update-ca-certificates --fresh 
 #&&\
 #    cd /tmp &&\
@@ -24,6 +24,7 @@ RUN /usr/sbin/update-ca-certificates --fresh
 #RUN mkdir -p /var/lib/sbopkg/SBo/`cat /etc/slackware-version | awk -F' ' '{print $2}'` \
 #    /var/lib/sbopkg/queues /var/log/sbopkg /var/cache/sbopkg /tmp/SBo && \
 #    sbopkg -r
+#    sqg -a
 #RUN    sbopkg -B -i radiusplugin
 RUN wget https://www.slackbuilds.org/slackbuilds/14.2/network/radiusplugin.tar.gz &&\
     tar axvf radiusplugin.tar.gz &&\
@@ -31,10 +32,11 @@ RUN wget https://www.slackbuilds.org/slackbuilds/14.2/network/radiusplugin.tar.g
     wget http://www.nongnu.org/radiusplugin/radiusplugin_v2.1a_beta1.tar.gz &&\
     ./radiusplugin.SlackBuild && \
     installpkg /tmp/radiusplugin-2.1a_beta1-x86_64-1_SBo.tgz 
+RUN removepkg binutils gcc-5 gcc-g++-5 perl\
+    glibc-2 libmpc kernel-headers make autoconf automake m4 zlib bc \
+    cmake libarchive nettle libxml2 gc flex bison rsync gnupg cyrus-sasl
 
+VOLUME ["/etc/openvpn"]
 
+EXPOSE 1194/udp 1194/tcp
 
-
-#    sqg -a
-
-EXPOSE 1194
