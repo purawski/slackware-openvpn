@@ -39,8 +39,12 @@ RUN removepkg binutils gcc-5 gcc-g++-5 perl\
 VOLUME ["/etc/openvpn"]
 
 EXPOSE 1194/udp 1194/tcp
+<<<<<<< HEAD
 
 COPY init.sh /
 #CMD ["/bin/sh"]
+=======
+COPY init.sh /
+>>>>>>> c5183b260f8258da3743b429ba938ec0e815694a
 CMD ["/init.sh"]
 
