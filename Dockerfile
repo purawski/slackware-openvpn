@@ -40,4 +40,7 @@ VOLUME ["/etc/openvpn"]
 
 EXPOSE 1194/udp 1194/tcp
 
+COPY init.sh /
+#CMD ["/bin/sh"]
+CMD ["/init.sh"]
 
