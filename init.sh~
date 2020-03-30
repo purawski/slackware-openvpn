@@ -5,6 +5,6 @@ if [ ! -c /dev/net/tun ]; then
 fi
 for conf in /etc/openvpn/*.conf
 do
-   /usr/sbin/openvpn --config $conf --daemon
+   /usr/sbin/openvpn --config $conf --deamon
 done
 sleep infinity
