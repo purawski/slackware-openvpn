@@ -1,24 +1,27 @@
 FROM vbatts/slackware:14.2
 ENV TERM xterm
 RUN mv /etc/slackpkg/mirrors /etc/slackpkg/mirrors.org &&\
-    echo "ftp://sunsite.icm.edu.pl/packages/linux-slackware/slackware64-14.2/" > /etc/slackpkg/mirrors &&\
-#    echo "http://sunsite.icm.edu.pl/packages/linux-slackware/slackware64-14.2/" > /etc/slackpkg/mirrors &&\
-    slackpkg -batch=on -default_answer=y update &&\
-    slackpkg -batch=on -default_answer=y upgrade-all
+#    echo "ftp://sunsite.icm.edu.pl/packages/linux-slackware/slackware64-14.2/" > /etc/slackpkg/mirrors &&\
+    echo "http://sunsite.icm.edu.pl/packages/linux-slackware/slackware64-14.2/" > /etc/slackpkg/mirrors &&\
+    slackpkg -batch=on -default_answer=y update 
+RUN slackpkg -batch=on -default_answer=y upgrade-all
 
 #RUN slackpkg -batch=on -default_answer=y upgrade patches    
 RUN slackpkg -batch=on -default_answer=y install \
 	  #  bind-9 \
             bash-completion \
+	    perl dcron \
 	    iputils \
             ca-certificates \
             lzo openvpn \
-            libpcap libnl3 dbus iptables guile libffi libgcrypt libgpg-error devs \
-
+            libpcap libnl3 dbus iptables guile libffi libgcrypt libgpg-error devs 
+#	    dcron
+RUN /usr/sbin/update-ca-certificates --fresh 
 RUN slackpkg -batch=on -default_answer=y install \
     binutils gcc-5 gcc-g++-5 perl\
     glibc-2 libmpc kernel-headers make autoconf automake m4 zlib bc \
-    cmake libarchive nettle libxml2 gc flex bison rsync gnupg cyrus-sasl
+    cmake libarchive nettle libxml2 gc flex bison rsync gnupg cyrus-sasl \
+    libffi libyaml python curl
 RUN /usr/sbin/update-ca-certificates --fresh 
 #&&\
 #    cd /tmp &&\
@@ -36,9 +39,17 @@ RUN wget https://www.slackbuilds.org/slackbuilds/14.2/network/radiusplugin.tar.g
     wget http://www.nongnu.org/radiusplugin/radiusplugin_v2.1a_beta1.tar.gz &&\
     ./radiusplugin.SlackBuild && \
     installpkg /tmp/radiusplugin-2.1a_beta1-x86_64-1_SBo.tgz 
+COPY requirements.txt /requirements.txt
+RUN curl -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py 
+RUN pip install --upgrade urllib3[secure] 
+RUN pip install --upgrade -r /requirements.txt
+
 RUN removepkg binutils gcc-5 gcc-g++-5 perl\
-    glibc-2 libmpc kernel-headers make autoconf automake m4 zlib bc \
-    cmake libarchive nettle libxml2 gc flex bison rsync cyrus-sasl
+    glibc-2 libmpc kernel-headers make autoconf automake m4 \
+    zlib \
+    bc \
+    cyrus-sasl \
+    cmake libarchive nettle libxml2 gc flex bison rsync 
 
 RUN ln -s /usr/lib64/openvpn/plugins/radiusplugin.so /usr/lib64/radiusplugin.so
 VOLUME ["/etc/openvpn"]
@@ -46,7 +57,7 @@ VOLUME ["/etc/openvpn"]
 EXPOSE 1194/udp 1194/tcp
 
 COPY init.sh /
-COPY server-8443.conf /etc/openvpn/server-8443.conf
+#COPY server-8443.conf /etc/openvpn/server-8443.conf
 #CMD ["/bin/sh"]
 CMD ["/init.sh"]
 
